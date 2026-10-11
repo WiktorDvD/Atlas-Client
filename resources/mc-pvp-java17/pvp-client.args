@@ -1,0 +1,7 @@
+# GraalVM CE 17 - light profile (no over-tuned G1). Timer agent still sets 1ms Windows scheduling.
+# Keep flags minimal so hitreg/click cadence stays stock-like.
+-XX:+UseG1GC
+-XX:MaxGCPauseMillis=20
+-Djava.net.preferIPv4Stack=true
+-Dio.netty.leakDetection.level=DISABLED
+-Dorg.lwjgl.util.NoChecks=true

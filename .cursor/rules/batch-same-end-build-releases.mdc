@@ -1,0 +1,25 @@
+---
+description: Batch launcher or client builds until every task targeting that same artifact is finished
+alwaysApply: true
+---
+
+# Batch Same End-Build Releases
+
+Applies to `F:\Projects\lunar-revamped-launcher` and `F:\Projects\LunarClientremake-main`.
+
+When several in-progress tasks share the same end-build artifact, finish all of them first. Then run **one** build and **one** release. Do not build or release after each task. Do not start a second parallel build of that same artifact while related edits are still landing. Do not ship a partial update that omits unfinished work aimed at that artifact.
+
+## End builds
+
+1. **Launcher** — `Josheyerr/lunar-revamped-launcher` → `LunarRevampedSetup.exe`
+2. **Client** — `Josheyerr/lunar-revamped-client` → `lunar-revamped-client-*.zip`
+
+They may release separately. Only batch work that shares the **same** end build.
+
+## How to release
+
+When the user asks to release/publish/push/ship either artifact, read and follow the skill:
+
+`.cursor/skills/release-lunar-revamped/SKILL.md`
+
+Do not re-explore workflows or invent alternate publish steps.

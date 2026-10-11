@@ -1,0 +1,21 @@
+name: Release client runtime
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'client-v*'
+
+jobs:
+  package:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Require a local runtime checkout
+        run: |
+          echo "Package the client from a machine that has the remake tree."
+          echo "Use: node scripts/package-client.mjs --runtime <path> --publish"
+          exit 0

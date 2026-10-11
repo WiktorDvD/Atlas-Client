@@ -1,0 +1,52 @@
+{
+  "name": "lethalgens-pvp-launcher",
+  "version": "1.2.2",
+  "private": true,
+  "description": "LethalGens PvP — Lunar Remake 1.8.9 with Wiktor's hitreg / visual pack",
+  "author": "Wiktor",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "build:main": "tsc -p tsconfig.node.json",
+    "build:renderer": "vite build",
+    "build": "npm run build:main && npm run build:renderer",
+    "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.json --noEmit",
+    "dev": "npm run build:main && concurrently -k \"vite\" \"wait-on http://127.0.0.1:5173 && cross-env ELECTRON_DEV=1 electron .\"",
+    "start": "npm run build && electron .",
+    "sync:lethalgens": "node scripts/sync-lethalgens-pack.mjs",
+    "dist": "npm run sync:lethalgens && npm run build && electron-builder --win",
+    "release:launcher": "node scripts/release-launcher.mjs",
+    "sync:pvp-java": "node scripts/sync-pvp-java-resources.mjs",
+    "lint": "eslint src --ext .ts,.tsx",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"scripts/**/*.mjs\""
+  },
+  "dependencies": {
+    "adm-zip": "^0.6.1",
+    "electron-store": "^8.2.0",
+    "electron-updater": "^6.8.9",
+    "framer-motion": "^14.0.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "electron": "^44.7.0",
+    "@types/adm-zip": "^0.5.8",
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.71.1",
+    "@typescript-eslint/parser": "^8.71.1",
+    "@vitejs/plugin-react": "^6.1.2",
+    "autoprefixer": "^10.6.1",
+    "concurrently": "^10.0.5",
+    "cross-env": "^10.1.0",
+    "electron-builder": "^26.15.3",
+    "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
+    "postcss": "^8.5.29",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.3",
+    "wait-on": "^9.5.1"
+  }
+}

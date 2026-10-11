@@ -1,0 +1,12 @@
+﻿---
+description: Lunar Revamped skill index — load lunar-revamped-map for workflow routing
+alwaysApply: true
+---
+
+# Lunar Revamped skills
+
+For launcher/client work, prefer skills over rediscovering the repo.
+
+Start with **lunar-revamped-map**. Other skills: `dev-launch-lunar-revamped`, `build-runtime-patches`, `genesis-ichor-launch-contract`, `lunar-client-deobf-build`, `debug-client-launch`, `microsoft-auth-lunar-revamped`, `release-lunar-revamped`, `create-lunar-client-module`.
+
+Personal copies: `~/.cursor/skills/<name>/SKILL.md`.

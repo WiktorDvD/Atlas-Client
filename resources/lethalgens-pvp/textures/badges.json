@@ -1,0 +1,26 @@
+[
+    {
+        "id": 292,
+        "name": "Owner Icon",
+        "description": "",
+        "resource": "lunar:badges/owner.webp",
+        "releasedAt": "2026-10-11T00:00:00.000Z",
+        "animated": false
+    },
+    {
+        "id": 291,
+        "name": "Partner Icon",
+        "description": "",
+        "resource": "lunar:badges/partner.webp",
+        "releasedAt": "2026-10-11T00:00:00.000Z",
+        "animated": false
+    },
+    {
+        "id": 290,
+        "name": "User Icon",
+        "description": "",
+        "resource": "lunar:badges/user.webp",
+        "releasedAt": "2026-10-11T00:00:00.000Z",
+        "animated": false
+    }
+]

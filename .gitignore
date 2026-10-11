@@ -1,0 +1,17 @@
+node_modules
+dist
+release
+release-client
+release-feel
+release-g1
+release-j21
+release-snap
+release-snap2
+out
+*.log
+.DS_Store
+.env
+.electron-builder.env
+smoke-*.txt
+resources/mc-pvp-java21
+resources/mc-pvp-java25

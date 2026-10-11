@@ -1,0 +1,12 @@
+{
+  "id": "lethalgens-pvp",
+  "name": "LethalGens PvP",
+  "version": "1.0.1",
+  "builtAt": "2026-10-11T17:44:09.999Z",
+  "includes": [
+    "AttackScheduler / Delay Fix",
+    "Soft 2-tick visual KB / hurt-cam",
+    "Lunar Icons (Owner/Partner/User)",
+    "PvP Optimizer defaults (freshRaycast)"
+  ]
+}

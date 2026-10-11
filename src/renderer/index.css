@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  /* Lunar Client-inspired: deep navy + lime play accent */
+  --accent: #5cff8a;
+  --accent-dim: #2bbf5a;
+  --accent-blue: #5b8cff;
+  --bg: #0a0c12;
+  --bg-elevated: #10131c;
+  --panel: rgba(16, 19, 28, 0.82);
+  --line: rgba(255, 255, 255, 0.07);
+  --text: #f2f5fa;
+  --muted: #8b93a7;
+  --danger: #ff5c6a;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #eef1f7;
+  --bg-elevated: #ffffff;
+  --panel: rgba(255, 255, 255, 0.88);
+  --line: rgba(15, 18, 28, 0.08);
+  --text: #12141c;
+  --muted: #5c6578;
+  --accent: #1db954;
+  --accent-dim: #159443;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', 'Segoe UI', sans-serif;
+  overflow: hidden;
+  user-select: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.glass {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(20px);
+}
+
+.skel {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+
+.lunar-shell {
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(91, 140, 255, 0.22), transparent 55%),
+    radial-gradient(900px 500px at 90% 10%, rgba(92, 255, 138, 0.1), transparent 50%),
+    radial-gradient(800px 400px at 50% 110%, rgba(91, 140, 255, 0.12), transparent 55%),
+    linear-gradient(180deg, #0c1018 0%, #07090e 100%);
+}
+
+.lunar-stars {
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(1px 1px at 28% 62%, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1px 1px at 44% 22%, rgba(255, 255, 255, 0.25), transparent),
+    radial-gradient(1px 1px at 61% 74%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 78% 34%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 91% 58%, rgba(255, 255, 255, 0.28), transparent);
+  opacity: 0.55;
+}
+
+.play-orb {
+  background: linear-gradient(180deg, #7dff9f 0%, #2fd66a 45%, #1aa84f 100%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.12) inset,
+    0 12px 40px rgba(47, 214, 106, 0.35),
+    0 0 60px rgba(92, 255, 138, 0.18);
+}
+
+.play-orb:disabled {
+  filter: grayscale(0.35);
+  box-shadow: none;
+}
+
+.nav-item-active {
+  background: linear-gradient(90deg, rgba(92, 255, 138, 0.18), rgba(92, 255, 138, 0.04));
+  border: 1px solid rgba(92, 255, 138, 0.28);
+  color: #fff;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
