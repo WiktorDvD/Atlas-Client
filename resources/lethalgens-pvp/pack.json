@@ -1,8 +1,8 @@
 {
   "id": "lethalgens-pvp",
   "name": "LethalGens PvP",
-  "version": "1.0.1",
-  "builtAt": "2026-10-11T17:44:09.999Z",
+  "version": "1.0.3",
+  "builtAt": "2026-10-11T18:28:15.338Z",
   "includes": [
     "AttackScheduler / Delay Fix",
     "Soft 2-tick visual KB / hurt-cam",
