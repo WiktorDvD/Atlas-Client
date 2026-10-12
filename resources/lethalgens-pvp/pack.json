@@ -1,10 +1,11 @@
 {
   "id": "lethalgens-pvp",
   "name": "LethalGens PvP",
-  "version": "1.0.4",
-  "builtAt": "2026-10-12T06:03:05.244Z",
+  "version": "1.0.5",
+  "builtAt": "2026-10-12T12:51:20.126Z",
   "includes": [
-    "Effortless AttackScheduler (skip-miss metronome)",
+    "Butter AttackScheduler (absolute 50ms grid)",
+    "Sticky WASD + mods menu last-mod memory",
     "Soft 2-tick visual KB / hurt-cam",
     "Lunar Icons (Owner/Partner/User)",
     "PvP Optimizer defaults (freshRaycast)"

@@ -27,6 +27,8 @@ export const PVP_SMOOTH_FLAGS: string[] = [
   '-XX:MaxGCPauseMillis=10',
   '-XX:+DisableExplicitGC',
   '-XX:+PerfDisableSharedMem',
+  '--add-modules=jdk.incubator.foreign',
+  '--enable-native-access=ALL-UNNAMED',
   '-Djava.net.preferIPv4Stack=true',
   '-Dio.netty.leakDetection.level=DISABLED',
   '-Dorg.lwjgl.util.NoChecks=true'

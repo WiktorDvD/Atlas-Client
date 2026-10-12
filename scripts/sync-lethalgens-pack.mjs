@@ -64,10 +64,11 @@ fs.writeFileSync(
     {
       id: 'lethalgens-pvp',
       name: 'LethalGens PvP',
-      version: '1.0.4',
+      version: '1.0.5',
       builtAt: new Date().toISOString(),
       includes: [
-        'Effortless AttackScheduler (skip-miss metronome)',
+        'Butter AttackScheduler (absolute 50ms grid)',
+        'Sticky WASD + mods menu last-mod memory',
         'Soft 2-tick visual KB / hurt-cam',
         'Lunar Icons (Owner/Partner/User)',
         'PvP Optimizer defaults (freshRaycast)'

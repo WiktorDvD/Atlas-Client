@@ -1,9 +1,12 @@
 # GraalVM CE 17 — low-latency PvP. Timer agent still sets 1ms Windows scheduling.
 # Keep G1 light so the butter AttackScheduler metronome stays consistent.
+# incubator.foreign: StickyKeys GetAsyncKeyState (hold W through inventory).
 -XX:+UseG1GC
 -XX:MaxGCPauseMillis=10
 -XX:+DisableExplicitGC
 -XX:+PerfDisableSharedMem
+--add-modules=jdk.incubator.foreign
+--enable-native-access=ALL-UNNAMED
 -Djava.net.preferIPv4Stack=true
 -Dio.netty.leakDetection.level=DISABLED
 -Dorg.lwjgl.util.NoChecks=true
