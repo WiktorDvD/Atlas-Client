@@ -2,11 +2,11 @@ import { app } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'
 
-const FEEL_VERSION = '6'
+const FEEL_VERSION = '7'
 const MARKER = 'pvp-feel.version'
 
 const PVP_OPTIMIZER_PROPS = `# Lunar Remake PvP feel - vanilla packets unchanged (no reach/timer/KB cheats).
-# Delay Fix (always on) zeros leftClickCounter every click for Badlion-like cadence.
+# Butter AttackScheduler owns click cadence; this file only tunes client feel/latency.
 # inputOptimizer OFF: Mouse.poll every frame desyncs LWJGL clicks
 # freshRaycast ON: refresh mouseOver on click so connects feel full-reach
 # framePacer/renderBudgeter OFF: avoid extra frame wait before clicks land
@@ -29,7 +29,7 @@ debugOverlay=false
 managedBy=lunar-remake-pvp-feel-${FEEL_VERSION}
 `
 
-/** OptiFine keys for Badlion-like hit/KB readability + light client. */
+/** OptiFine: kill smooth/lerp lag, keep frame pipeline light for realtime visuals. */
 const OPTIFINE_PATCH: Record<string, string> = {
   ofSmoothWorld: 'false', // mushy entity/KB motion when on
   ofSmoothFps: 'false',
@@ -38,7 +38,6 @@ const OPTIFINE_PATCH: Record<string, string> = {
   ofRenderRegions: 'true',
   ofLazyChunkLoading: 'false',
   ofSmoothBiomes: 'false',
-  // Async-ish chunk pipeline within OptiFine: multi updates, dynamic priority for nearby
   ofChunkUpdates: '5',
   ofChunkUpdatesDynamic: 'true',
   ofDynamicFov: 'false',
@@ -58,10 +57,13 @@ const OPTIFINE_PATCH: Record<string, string> = {
   ofFireworkParticles: 'false',
   ofDrippingWaterLava: 'false',
   ofRainSplash: 'false',
-  // Keep fire/explosion cues for PvP readability
   ofAnimatedFire: 'true',
   ofAnimatedFlame: 'true',
-  ofAnimatedExplosion: 'true'
+  ofAnimatedExplosion: 'true',
+  ofShowCapes: 'false',
+  ofDroppedItems: '0',
+  ofVignette: '1',
+  ofLagometer: 'false'
 }
 
 const VANILLA_PATCH: Record<string, string> = {
@@ -75,9 +77,9 @@ const VANILLA_PATCH: Record<string, string> = {
   useNativeTransport: 'true',
   entityShadows: 'false',
   mipmapLevels: '0',
-  maxFps: '500',
+  maxFps: '1000',
   pauseOnLostFocus: 'false',
-  renderDistance: '8'
+  renderDistance: '6'
 }
 
 const DISABLE_HEAVY_MODS = [

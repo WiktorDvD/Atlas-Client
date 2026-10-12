@@ -24,7 +24,9 @@ export function isStockLauncherRam(minMb: number, maxMb: number): boolean {
  */
 export const PVP_SMOOTH_FLAGS: string[] = [
   '-XX:+UseG1GC',
-  '-XX:MaxGCPauseMillis=20',
+  '-XX:MaxGCPauseMillis=10',
+  '-XX:+DisableExplicitGC',
+  '-XX:+PerfDisableSharedMem',
   '-Djava.net.preferIPv4Stack=true',
   '-Dio.netty.leakDetection.level=DISABLED',
   '-Dorg.lwjgl.util.NoChecks=true'

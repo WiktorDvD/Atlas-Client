@@ -64,10 +64,10 @@ fs.writeFileSync(
     {
       id: 'lethalgens-pvp',
       name: 'LethalGens PvP',
-      version: '1.0.3',
+      version: '1.0.4',
       builtAt: new Date().toISOString(),
       includes: [
-        'AttackScheduler / Delay Fix',
+        'Effortless AttackScheduler (skip-miss metronome)',
         'Soft 2-tick visual KB / hurt-cam',
         'Lunar Icons (Owner/Partner/User)',
         'PvP Optimizer defaults (freshRaycast)'
