@@ -7,7 +7,7 @@ import { emit } from '../bus'
 import { markQuitting } from '../window'
 
 const LATEST_RELEASE_URL = `https://api.github.com/repos/${LAUNCHER_OWNER}/${LAUNCHER_REPO}/releases/latest`
-const INSTALLER_URL = `https://github.com/${LAUNCHER_OWNER}/${LAUNCHER_REPO}/releases/latest/download/AtlasClient-Setup.exe`
+const INSTALLER_URL = `https://github.com/${LAUNCHER_OWNER}/${LAUNCHER_REPO}/releases/latest/download/Atlas%20Client.exe`
 
 let seq = 0
 let sessionManual = false

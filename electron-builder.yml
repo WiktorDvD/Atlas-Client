@@ -24,7 +24,7 @@ win:
   target:
     - target: nsis
       arch: [x64]
-  artifactName: AtlasClient-Setup.${ext}
+  artifactName: Atlas Client.${ext}
 nsis:
   oneClick: false
   perMachine: false
