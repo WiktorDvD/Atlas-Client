@@ -149,7 +149,7 @@ function githubWebHeaders(accept: string): Record<string, string> {
 function tagFromReleaseText(text: string): string {
   const fromPath = text.match(/\/releases\/tag\/([^"'<>\s?#]+)/)
   if (fromPath?.[1]) return decodeURIComponent(fromPath[1])
-  const fromZip = text.match(/lunar-revamped-client-(v?\d[\w.-]*)\.zip/)
+  const fromZip = text.match(/(?:Atlas-Client|lunar-revamped-client)-(v?\d[\w.-]*)\.zip/i)
   if (fromZip?.[1]) {
     const version = fromZip[1].replace(/^v/, '')
     return `v${version}`
@@ -410,7 +410,7 @@ function statusFromLocal(remote = '', changelog = '', errorMessage = ''): Client
 
 export function localClientStatus(): ClientStatus {
   const release = releaseCache?.value ?? null
-  const remote = (release?.tag_name ?? '').replace(/^v/, '')
+  const remote = clientVersionFromRelease(release)
   const changelog = release?.body ?? ''
   return statusFromLocal(remote, changelog)
 }
@@ -434,7 +434,7 @@ export async function clientStatus(): Promise<ClientStatus> {
   try {
     const release = await latestRelease(CLIENT_REPO)
     rememberRelease(release)
-    const remote = (release?.tag_name ?? '').replace(/^v/, '')
+    const remote = clientVersionFromRelease(release)
     return statusFromLocal(remote, release?.body ?? '')
   } catch (error) {
     const detail = error instanceof Error ? error.message : 'Could not check for updates'
@@ -470,6 +470,18 @@ function releaseVersion(release: GithubRelease | null): string {
   return (release?.tag_name ?? '').replace(/^v/, '')
 }
 
+/** Prefer version encoded in the client zip name (e.g. Atlas-Client-1.0.12.zip). */
+function clientVersionFromRelease(release: GithubRelease | null): string {
+  const zip = release?.assets?.find((asset) => asset.name.endsWith('.zip'))
+  if (zip) {
+    const match =
+      zip.name.match(/(?:Atlas-Client|lunar-revamped-client)-v?(\d[\w.-]*)\.zip/i) ||
+      zip.name.match(/-v?(\d+\.\d[\w.-]*)\.zip/i)
+    if (match?.[1]) return match[1].replace(/^v/, '')
+  }
+  return releaseVersion(release)
+}
+
 function releaseHasZip(release: GithubRelease | null): boolean {
   return Boolean(release?.assets?.some((asset) => asset.name.endsWith('.zip')))
 }
@@ -494,7 +506,7 @@ export async function ensureClientBeforePlay(): Promise<ClientPlayPrepare> {
   }
 
   const ready = release ? withPublicZip(CLIENT_REPO, release) : null
-  const remote = releaseVersion(ready)
+  const remote = clientVersionFromRelease(ready)
   const hasZip = releaseHasZip(ready)
   const needsInstall = Boolean(remote && hasZip && remote !== installedVersion)
   const launchingLocalRemakeOnly = devReady && !installedReady
@@ -693,7 +705,7 @@ export async function installLatestClient(known?: GithubRelease): Promise<Client
     const release = withPublicZip(CLIENT_REPO, fetched)
     const zipAsset = release.assets?.find((asset) => asset.name.endsWith('.zip'))
     if (!zipAsset) throw new Error('Client release has no zip.')
-    const version = releaseVersion(release) || '0'
+    const version = clientVersionFromRelease(release) || '0'
     const archive = path.join(folders.cache(), zipAsset.name)
     const url = publicAssetUrl(zipAsset.browser_download_url, CLIENT_REPO, version, zipAsset.name)
     const fallbackUrl = publicLatestZipUrl(CLIENT_REPO, zipAsset.name)
