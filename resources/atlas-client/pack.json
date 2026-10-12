@@ -2,7 +2,7 @@
   "id": "atlas-client",
   "name": "Atlas Client",
   "version": "1.0.5",
-  "builtAt": "2026-10-12T13:38:17.407Z",
+  "builtAt": "2026-10-12T14:00:58.330Z",
   "includes": [
     "Butter AttackScheduler (absolute 50ms grid)",
     "Sticky WASD + mods menu last-mod memory",

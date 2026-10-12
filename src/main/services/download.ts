@@ -4,7 +4,7 @@ import path from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
 import AdmZip from 'adm-zip'
 import { IpcChannel } from '../../shared/ipc'
-import { CLIENT_REPO, GITHUB_OWNER, MC_VERSION, type ClientManifest } from '../../shared/manifest'
+import { CLIENT_OWNER, CLIENT_REPO, MC_VERSION, type ClientManifest } from '../../shared/manifest'
 import type { ClientStatus, DownloadProgress, NewsItem } from '../../shared/types'
 import { emit } from '../bus'
 import { folders } from '../paths'
@@ -162,11 +162,11 @@ function publicZipName(repo: string, version: string): string {
 }
 
 function publicZipUrl(repo: string, tag: string, name: string): string {
-  return `https://github.com/${GITHUB_OWNER}/${repo}/releases/download/${tag}/${name}`
+  return `https://github.com/${CLIENT_OWNER}/${repo}/releases/download/${tag}/${name}`
 }
 
 function publicLatestZipUrl(repo: string, name: string): string {
-  return `https://github.com/${GITHUB_OWNER}/${repo}/releases/latest/download/${name}`
+  return `https://github.com/${CLIENT_OWNER}/${repo}/releases/latest/download/${name}`
 }
 
 function publicAssetUrl(url: string, repo: string, version: string, name: string): string {
@@ -183,7 +183,7 @@ function syntheticRelease(repo: string, tag: string): GithubRelease {
   return {
     tag_name: tagName,
     body: '',
-    html_url: `https://github.com/${GITHUB_OWNER}/${repo}/releases/tag/${tagName}`,
+    html_url: `https://github.com/${CLIENT_OWNER}/${repo}/releases/tag/${tagName}`,
     published_at: '',
     assets: [
       {
@@ -237,7 +237,7 @@ async function githubHttpError(response: Response, repo: string): Promise<Error>
 }
 
 async function fetchGithubLatest(repo: string): Promise<{ release: GithubRelease | null; error?: Error }> {
-  const response = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${repo}/releases/latest`, {
+  const response = await fetch(`https://api.github.com/repos/${CLIENT_OWNER}/${repo}/releases/latest`, {
     headers: githubApiHeaders()
   })
   if (response.status === 404) return { release: null }
@@ -249,7 +249,7 @@ async function fetchGithubLatest(repo: string): Promise<{ release: GithubRelease
 }
 
 async function latestTagFromRedirect(repo: string): Promise<string> {
-  const url = `https://github.com/${GITHUB_OWNER}/${repo}/releases/latest`
+  const url = `https://github.com/${CLIENT_OWNER}/${repo}/releases/latest`
   const headers = githubWebHeaders('text/html')
   const manual = await fetch(url, { headers, redirect: 'manual' })
   const fromLocation = tagFromReleaseText(manual.headers.get('location') || '')
@@ -259,7 +259,7 @@ async function latestTagFromRedirect(repo: string): Promise<string> {
 }
 
 async function latestTagFromAtom(repo: string): Promise<string> {
-  const response = await fetch(`https://github.com/${GITHUB_OWNER}/${repo}/releases.atom`, {
+  const response = await fetch(`https://github.com/${CLIENT_OWNER}/${repo}/releases.atom`, {
     headers: githubWebHeaders('application/atom+xml, application/xml, text/xml')
   })
   if (!response.ok) return ''
@@ -269,7 +269,7 @@ async function latestTagFromAtom(repo: string): Promise<string> {
 }
 
 async function latestTagFromHtml(repo: string): Promise<string> {
-  const response = await fetch(`https://github.com/${GITHUB_OWNER}/${repo}/releases/latest`, {
+  const response = await fetch(`https://github.com/${CLIENT_OWNER}/${repo}/releases/latest`, {
     headers: githubWebHeaders('text/html'),
     redirect: 'follow'
   })

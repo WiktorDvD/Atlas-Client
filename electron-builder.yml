@@ -36,7 +36,7 @@ nsis:
 publish:
   provider: github
   owner: WiktorDvD
-  repo: lunar-remake1
+  repo: Atlas-Client
   releaseType: release
 mac:
   target: dmg
