@@ -9,10 +9,18 @@ const gotLock = app.requestSingleInstanceLock()
 if (!gotLock) app.quit()
 
 app.whenReady().then(() => {
-  loadStore()
+  try {
+    loadStore()
+  } catch (error) {
+    console.error('[Atlas] loadStore failed, using empty defaults', error)
+  }
   registerIpc()
   createWindow()
-  if (loadStore().settings.onLaunch === 'tray') ensureTray()
+  try {
+    if (loadStore().settings.onLaunch === 'tray') ensureTray()
+  } catch {
+    /* ignore */
+  }
   void bootBundledPvpJava()
   void bootAutoUpdate()
 })

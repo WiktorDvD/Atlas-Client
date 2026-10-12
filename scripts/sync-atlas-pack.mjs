@@ -1,6 +1,6 @@
 /**
  * Copy Wiktor's live PvP overlay (localpatches + Lunar Icons) into
- * resources/lethalgens-pvp for electron-builder.
+ * resources/atlas-client for electron-builder.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -8,19 +8,13 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(__dirname, '..')
-const dest = path.join(root, 'resources', 'lethalgens-pvp')
+const dest = path.join(root, 'resources', 'atlas-client')
 
 const appData = process.env.APPDATA || ''
 const libs = path.join(appData, '.lunar-remake', 'versions', '1.0.12', 'libs')
 const patchJar = path.join(libs, 'lunar-localpatches.jar')
 const badgeSrc = path.join(libs, 'lunar-assets', 'textures', 'assets', 'lunar')
-const fallbackBadges = path.join(
-  root,
-  '..',
-  'client-patches',
-  'assets',
-  'lunar-icons'
-)
+const fallbackBadges = path.join(root, '..', 'client-patches', 'assets', 'lunar-icons')
 
 function copyFile(src, out) {
   fs.mkdirSync(path.dirname(out), { recursive: true })
@@ -30,7 +24,7 @@ function copyFile(src, out) {
 
 if (!fs.existsSync(patchJar)) {
   console.error('Missing patched jar:', patchJar)
-  console.error('Run client-patches\\build.ps1 first, then launch Lunar Remake once.')
+  console.error('Run client-patches\\build.ps1 first, then launch once.')
   process.exit(1)
 }
 
@@ -40,9 +34,7 @@ fs.mkdirSync(dest, { recursive: true })
 copyFile(patchJar, path.join(dest, 'lunar-localpatches.jar'))
 
 const badgeDir = fs.existsSync(path.join(badgeSrc, 'badges.json')) ? badgeSrc : null
-const iconDir = fs.existsSync(path.join(fallbackBadges, 'badges-slim.json'))
-  ? fallbackBadges
-  : null
+const iconDir = fs.existsSync(path.join(fallbackBadges, 'badges-slim.json')) ? fallbackBadges : null
 
 if (badgeDir) {
   copyFile(path.join(badgeDir, 'badges.json'), path.join(dest, 'textures', 'badges.json'))
@@ -62,8 +54,8 @@ fs.writeFileSync(
   path.join(dest, 'pack.json'),
   JSON.stringify(
     {
-      id: 'lethalgens-pvp',
-      name: 'LethalGens PvP',
+      id: 'atlas-client',
+      name: 'Atlas Client',
       version: '1.0.5',
       builtAt: new Date().toISOString(),
       includes: [
@@ -80,4 +72,4 @@ fs.writeFileSync(
   'utf8'
 )
 
-console.log('LethalGens pack synced ->', dest)
+console.log('Atlas Client pack synced ->', dest)

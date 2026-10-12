@@ -20,7 +20,7 @@ import { ensureJava } from './java'
 import { extractNatives } from './natives'
 import { startLocalServices } from './fakeServices'
 import { applyPvpFeelProfile } from './pvpFeel'
-import { applyLethalgensPack } from './lethalgensPack'
+import { applyAtlasPack } from './atlasPack'
 
 const VANILLA_LIBS = [
   'oshi-project/oshi-core/1.1/oshi-core-1.1.jar',
@@ -232,7 +232,7 @@ async function buildPlan(prepare: boolean): Promise<Plan> {
   fs.mkdirSync(logs, { recursive: true })
   fs.mkdirSync(path.join(dataDir, 'profiles', '1.8', 'mods'), { recursive: true })
   applyPvpFeelProfile(gameDir, dataDir)
-  applyLethalgensPack()
+  applyAtlasPack()
   const launcherCache = path.join(dataDir, 'launcher-cache')
   fs.mkdirSync(launcherCache, { recursive: true })
   fs.writeFileSync(path.join(launcherCache, 'installation-id'), 'lunar-revamped')

@@ -6,7 +6,7 @@ interface Toast {
   text: string
 }
 
-export type AppPage = 'play' | 'instances' | 'mods' | 'servers' | 'skins' | 'settings' | 'console'
+export type AppPage = 'play' | 'instances' | 'servers' | 'skins' | 'settings' | 'console'
 
 interface AppState {
   snap: AppSnapshot | null

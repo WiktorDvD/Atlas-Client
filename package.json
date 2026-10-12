@@ -1,8 +1,8 @@
 {
-  "name": "lethalgens-pvp-launcher",
-  "version": "1.2.5",
+  "name": "atlas-client-launcher",
+  "version": "1.3.0",
   "private": true,
-  "description": "LethalGens PvP — Lunar Remake 1.8.9 with Wiktor's hitreg / visual pack",
+  "description": "Atlas Client — Lunar Remake 1.8.9 with Wiktor's hitreg / visual pack",
   "author": "Wiktor",
   "main": "dist/main/index.js",
   "scripts": {
@@ -12,8 +12,8 @@
     "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.json --noEmit",
     "dev": "npm run build:main && concurrently -k \"vite\" \"wait-on http://127.0.0.1:5173 && cross-env ELECTRON_DEV=1 electron .\"",
     "start": "npm run build && electron .",
-    "sync:lethalgens": "node scripts/sync-lethalgens-pack.mjs",
-    "dist": "npm run sync:lethalgens && npm run build && electron-builder --win",
+    "sync:atlas": "node scripts/sync-atlas-pack.mjs",
+    "dist": "npm run sync:atlas && npm run build && electron-builder --win",
     "release:launcher": "node scripts/release-launcher.mjs",
     "sync:pvp-java": "node scripts/sync-pvp-java-resources.mjs",
     "lint": "eslint src --ext .ts,.tsx",

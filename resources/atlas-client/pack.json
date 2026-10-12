@@ -1,8 +1,8 @@
 {
-  "id": "lethalgens-pvp",
-  "name": "LethalGens PvP",
+  "id": "atlas-client",
+  "name": "Atlas Client",
   "version": "1.0.5",
-  "builtAt": "2026-10-12T12:51:20.126Z",
+  "builtAt": "2026-10-12T13:38:17.407Z",
   "includes": [
     "Butter AttackScheduler (absolute 50ms grid)",
     "Sticky WASD + mods menu last-mod memory",

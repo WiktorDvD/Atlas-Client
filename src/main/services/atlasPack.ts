@@ -3,8 +3,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { folders } from '../paths'
 
-const PACK_ID = 'lethalgens-pvp'
-const MARKER = 'lethalgens-pvp.version'
+const PACK_ID = 'atlas-client'
+const MARKER = 'atlas-client.version'
 
 function packRoot(): string {
   if (app.isPackaged) {
@@ -35,7 +35,7 @@ function readPackVersion(root: string): string {
  * Lunar Remake runtime so friends get the same hitreg/visual pack.
  * Safe to call every launch; skips work when already current.
  */
-export function applyLethalgensPack(): void {
+export function applyAtlasPack(): void {
   const root = packRoot()
   const jarSrc = path.join(root, 'lunar-localpatches.jar')
   if (!fs.existsSync(jarSrc)) return
@@ -55,7 +55,6 @@ export function applyLethalgensPack(): void {
 
     const destA = path.join(libs, 'lunar-localpatches.jar')
     const destB = path.join(libs, 'multiver-full', 'lunar-localpatches.jar')
-    // Always refresh jars when pack changes; also refresh if missing.
     if (!already || !fs.existsSync(destA)) {
       copyFile(jarSrc, destA)
       if (fs.existsSync(path.dirname(destB))) copyFile(jarSrc, destB)
@@ -81,6 +80,6 @@ export function applyLethalgensPack(): void {
   }
 
   if (applied > 0) {
-    console.log(`[LethalGens] applied PvP pack ${packVer} to ${applied} runtime(s)`)
+    console.log(`[Atlas] applied PvP pack ${packVer} to ${applied} runtime(s)`)
   }
 }

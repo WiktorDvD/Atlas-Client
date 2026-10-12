@@ -1,5 +1,5 @@
-appId: com.lethalgens.pvp.launcher
-productName: LethalGens PvP
+appId: com.atlas.client.launcher
+productName: Atlas Client
 directories:
   output: release
 files:
@@ -8,26 +8,30 @@ files:
   - node_modules/**/*
 asar: true
 extraResources:
+  - from: build/icon.png
+    to: icon.png
   # Small PVP kit (forwarder + timer-agent). GraalVM CE 17 downloads on first launch.
   - from: resources/mc-pvp-java17
     to: mc-pvp-java17
   - from: resources/pvp-feel
     to: pvp-feel
   # Wiktor's patched client overlay (hitreg / icons / realtime visuals)
-  - from: resources/lethalgens-pvp
-    to: lethalgens-pvp
+  - from: resources/atlas-client
+    to: atlas-client
+
 win:
+  icon: build/icon.ico
   target:
     - target: nsis
       arch: [x64]
-  artifactName: LethalGensPvP-Setup.${ext}
+  artifactName: AtlasClient-Setup.${ext}
 nsis:
   oneClick: false
   perMachine: false
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: LethalGens PvP
+  shortcutName: Atlas Client
   installerSidebar: null
 publish:
   provider: github

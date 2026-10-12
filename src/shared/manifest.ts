@@ -13,7 +13,7 @@ export interface ClientManifest {
 /** Client zip releases (upstream). */
 export const GITHUB_OWNER = 'Josheyerr'
 export const CLIENT_REPO = 'lunar-revamped-client'
-/** Launcher auto-update + LethalGens Setup.exe releases. */
+/** Launcher auto-update + Atlas Client Setup.exe releases. */
 export const LAUNCHER_OWNER = 'WiktorDvD'
 export const LAUNCHER_REPO = 'lunar-remake1'
 export const MC_VERSION = '1.8.9'

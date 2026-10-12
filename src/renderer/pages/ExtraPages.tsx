@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { ModEntry, ServerEntry, SkinInfo } from '@shared/types'
+import type { ServerEntry, SkinInfo } from '@shared/types'
 import { useApp } from '../stores/appStore'
 
 export function InstancesPage() {
@@ -26,29 +26,6 @@ export function InstancesPage() {
             <button className="text-xs text-[var(--muted)]" onClick={() => void window.lunar.deleteInstance(instance.id).then(() => refresh()).catch((e: unknown) => toast(e instanceof Error ? e.message : 'Failed'))}>
               Delete
             </button>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )
-}
-
-export function ModsPage() {
-  const [mods, setMods] = useState<ModEntry[]>([])
-  const toast = useApp((s) => s.toast)
-  useEffect(() => {
-    void window.lunar.listMods().then(setMods).catch((e: unknown) => toast(e instanceof Error ? e.message : 'Failed'))
-  }, [toast])
-  return (
-    <section className="glass rounded-3xl p-6">
-      <h1 className="text-xl font-semibold">Mods</h1>
-      <p className="mt-1 text-sm text-[var(--muted)]">Drop jars into the instance mods folder. Toggle disables by renaming.</p>
-      <ul className="mt-4 space-y-2">
-        {mods.length === 0 ? <li className="text-sm text-[var(--muted)]">No mods yet.</li> : null}
-        {mods.map((mod) => (
-          <li key={mod.fileName} className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2 text-sm">
-            <span>{mod.name}</span>
-            <button onClick={() => void window.lunar.toggleMod(mod.fileName, !mod.enabled).then(setMods)}>{mod.enabled ? 'On' : 'Off'}</button>
           </li>
         ))}
       </ul>

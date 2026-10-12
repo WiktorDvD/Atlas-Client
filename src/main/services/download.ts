@@ -533,7 +533,7 @@ function isFsLock(error: unknown): boolean {
 
 function inUseError(target: string): Error {
   return new Error(
-    `Could not replace ${target}. That folder is in use. Close the game, then try Download client again.`
+    `Could not replace ${target}. That folder is in use. Close the game, then press Play again.`
   )
 }
 

@@ -74,13 +74,18 @@ function seal(value: string): string {
 
 function open(value: string | undefined): string {
   if (!value) return ''
-  if (value.startsWith('enc:')) {
-    return safeStorage.decryptString(Buffer.from(value.slice(4), 'base64'))
+  try {
+    if (value.startsWith('enc:')) {
+      return safeStorage.decryptString(Buffer.from(value.slice(4), 'base64'))
+    }
+    if (value.startsWith('plain:')) {
+      return Buffer.from(value.slice(6), 'base64').toString('utf8')
+    }
+    return value
+  } catch {
+    // DPAPI key changed / corrupted ciphertext — drop token so launcher still boots.
+    return ''
   }
-  if (value.startsWith('plain:')) {
-    return Buffer.from(value.slice(6), 'base64').toString('utf8')
-  }
-  return value
 }
 
 interface DiskAccount extends Omit<Account, 'accessToken' | 'refreshToken'> {
@@ -141,14 +146,26 @@ function shouldAdoptDefaultJava(current: string, bundled: string): boolean {
 export function loadStore(): Persisted {
   if (cache) return cache
   const raw = structuredClone(db().store)
-  raw.accounts = (raw.accounts as DiskAccount[]).map((account) => ({
-    ...account,
-    accessToken: open(account.accessToken),
-    refreshToken: open(account.refreshToken)
-  }))
+  let migrated = false
+  raw.accounts = (raw.accounts as DiskAccount[]).map((account) => {
+    const accessToken = open(account.accessToken)
+    const refreshToken = open(account.refreshToken)
+    if ((account.accessToken && !accessToken) || (account.refreshToken && !refreshToken)) {
+      migrated = true
+    }
+    return {
+      ...account,
+      accessToken,
+      refreshToken
+    }
+  })
   const defaults = defaultSettings()
   raw.settings = { ...defaults, ...raw.settings }
-  let migrated = false
+  // Force Atlas blue if still on older launcher accents.
+  if (!raw.settings.accent || raw.settings.accent === '#5cff8a' || raw.settings.accent === '#1eb8ef') {
+    raw.settings.accent = DEFAULT_ACCENT
+    migrated = true
+  }
   if (isStockLauncherRam(raw.settings.minRamMb, raw.settings.maxRamMb)) {
     const ram = optimalGameRamMb(Math.round(os.totalmem() / (1024 * 1024)))
     raw.settings.minRamMb = ram

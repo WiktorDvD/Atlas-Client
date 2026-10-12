@@ -9,8 +9,24 @@ export function getWindow(): BrowserWindow | null {
   return mainWindow
 }
 
+function appIcon(): ReturnType<typeof nativeImage.createEmpty> {
+  const candidates = [
+    path.join(process.resourcesPath, 'icon.png'),
+    path.join(__dirname, '../../build/icon.ico'),
+    path.join(__dirname, '../../build/icon.png'),
+    path.join(app.getAppPath(), 'build', 'icon.ico'),
+    path.join(app.getAppPath(), 'build', 'icon.png')
+  ]
+  for (const file of candidates) {
+    const image = nativeImage.createFromPath(file)
+    if (!image.isEmpty()) return image
+  }
+  return nativeImage.createEmpty()
+}
+
 export function createWindow(): BrowserWindow {
   const dev = process.env.ELECTRON_DEV === '1'
+  const icon = appIcon()
   mainWindow = new BrowserWindow({
     width: 1100,
     height: 720,
@@ -18,8 +34,9 @@ export function createWindow(): BrowserWindow {
     minHeight: 560,
     frame: false,
     roundedCorners: true,
-    backgroundColor: '#0a0c12',
-    title: 'Lunar Remake',
+    backgroundColor: '#07090e',
+    title: 'Atlas Client',
+    icon: icon.isEmpty() ? undefined : icon,
     show: false,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
@@ -73,11 +90,16 @@ export function applyLaunchBehavior(): void {
 
 export function ensureTray(): void {
   if (tray) return
-  const image = nativeImage.createFromDataURL(
-    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAHElEQVQokWNgGAWjYBSMglEwCkbBKBgFgwMAAAD//2kBBx0l1m4AAAAASUVORK5CYII='
-  )
+  let image = appIcon()
+  if (image.isEmpty()) {
+    image = nativeImage.createFromDataURL(
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAHElEQVQokWNgGAWjYBSMglEwCkbBKBgFgwMAAAD//2kBBx0l1m4AAAAASUVORK5CYII='
+    )
+  } else {
+    image = image.resize({ width: 16, height: 16 })
+  }
   tray = new Tray(image)
-  tray.setToolTip('Lunar Revamped')
+  tray.setToolTip('Atlas Client')
   tray.setContextMenu(
     Menu.buildFromTemplate([
       { label: 'Show', click: () => mainWindow?.show() },

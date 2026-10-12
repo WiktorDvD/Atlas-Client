@@ -4,29 +4,34 @@
 
 :root {
   color-scheme: dark;
-  /* Lunar Client-inspired: deep navy + lime play accent */
-  --accent: #5cff8a;
-  --accent-dim: #2bbf5a;
-  --accent-blue: #5b8cff;
-  --bg: #0a0c12;
-  --bg-elevated: #10131c;
-  --panel: rgba(16, 19, 28, 0.82);
+  /* Atlas Client — Lunar-like blue + green */
+  --accent: #3ec6ff;
+  --accent-dim: #1a9fd6;
+  --accent-play: #5cff8a;
+  --accent-play-dim: #2fd66a;
+  --bg: #07090e;
+  --bg-elevated: #0e1219;
+  --panel: rgba(14, 18, 25, 0.86);
   --line: rgba(255, 255, 255, 0.07);
   --text: #f2f5fa;
   --muted: #8b93a7;
   --danger: #ff5c6a;
+  --sidebar: #090b10;
 }
 
 :root[data-theme='light'] {
   color-scheme: light;
   --bg: #eef1f7;
   --bg-elevated: #ffffff;
-  --panel: rgba(255, 255, 255, 0.88);
+  --panel: rgba(255, 255, 255, 0.92);
   --line: rgba(15, 18, 28, 0.08);
   --text: #12141c;
   --muted: #5c6578;
-  --accent: #1db954;
-  --accent-dim: #159443;
+  --accent: #1a9fd6;
+  --accent-dim: #0e7eab;
+  --accent-play: #1db954;
+  --accent-play-dim: #159443;
+  --sidebar: #f3f5f9;
 }
 
 html,
@@ -36,7 +41,7 @@ body,
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Outfit', 'Segoe UI', sans-serif;
+  font-family: 'Sora', 'Segoe UI', sans-serif;
   overflow: hidden;
   user-select: none;
 }
@@ -51,7 +56,7 @@ select {
 .glass {
   background: var(--panel);
   border: 1px solid var(--line);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(18px);
 }
 
 .skel {
@@ -60,15 +65,15 @@ select {
   animation: shimmer 1.2s infinite;
 }
 
-.lunar-shell {
+.atlas-shell {
   background:
-    radial-gradient(1200px 600px at 15% -10%, rgba(91, 140, 255, 0.22), transparent 55%),
-    radial-gradient(900px 500px at 90% 10%, rgba(92, 255, 138, 0.1), transparent 50%),
-    radial-gradient(800px 400px at 50% 110%, rgba(91, 140, 255, 0.12), transparent 55%),
+    radial-gradient(1100px 560px at 12% -12%, rgba(62, 198, 255, 0.2), transparent 55%),
+    radial-gradient(900px 500px at 88% 6%, rgba(92, 255, 138, 0.12), transparent 50%),
+    radial-gradient(700px 380px at 50% 110%, rgba(62, 198, 255, 0.1), transparent 55%),
     linear-gradient(180deg, #0c1018 0%, #07090e 100%);
 }
 
-.lunar-stars {
+.atlas-stars {
   background-image:
     radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.45), transparent),
     radial-gradient(1px 1px at 28% 62%, rgba(255, 255, 255, 0.35), transparent),
@@ -76,26 +81,63 @@ select {
     radial-gradient(1px 1px at 61% 74%, rgba(255, 255, 255, 0.3), transparent),
     radial-gradient(1px 1px at 78% 34%, rgba(255, 255, 255, 0.4), transparent),
     radial-gradient(1px 1px at 91% 58%, rgba(255, 255, 255, 0.28), transparent);
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
-.play-orb {
-  background: linear-gradient(180deg, #7dff9f 0%, #2fd66a 45%, #1aa84f 100%);
+.launch-btn {
+  background: linear-gradient(180deg, #7dff9f 0%, #5cff8a 42%, #2fd66a 100%);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.12) inset,
-    0 12px 40px rgba(47, 214, 106, 0.35),
-    0 0 60px rgba(92, 255, 138, 0.18);
+    0 0 0 1px rgba(255, 255, 255, 0.14) inset,
+    0 14px 40px rgba(47, 214, 106, 0.35),
+    0 0 60px rgba(92, 255, 138, 0.16);
+  color: #07110a;
+  letter-spacing: 0.14em;
+  font-weight: 700;
 }
 
-.play-orb:disabled {
+.launch-btn:disabled {
   filter: grayscale(0.35);
   box-shadow: none;
+  opacity: 0.75;
 }
 
-.nav-item-active {
-  background: linear-gradient(90deg, rgba(92, 255, 138, 0.18), rgba(92, 255, 138, 0.04));
-  border: 1px solid rgba(92, 255, 138, 0.28);
+.nav-active {
   color: #fff;
+  background: linear-gradient(90deg, rgba(62, 198, 255, 0.18), rgba(62, 198, 255, 0.04));
+  border: 1px solid rgba(62, 198, 255, 0.28);
+}
+
+.hero-banner {
+  background:
+    radial-gradient(ellipse 70% 90% at 82% 45%, rgba(62, 198, 255, 0.22), transparent 55%),
+    radial-gradient(ellipse 50% 70% at 18% 75%, rgba(92, 255, 138, 0.12), transparent 50%),
+    linear-gradient(145deg, #121826 0%, #0a0e16 55%, #08141c 100%);
+}
+
+.news-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+  border: 1px solid var(--line);
+  transition:
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.news-card:hover {
+  border-color: rgba(62, 198, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.server-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.server-chip:hover {
+  background: rgba(62, 198, 255, 0.12);
+  border-color: rgba(62, 198, 255, 0.4);
 }
 
 @keyframes shimmer {
@@ -105,4 +147,19 @@ select {
   100% {
     background-position: -100% 0;
   }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise-in {
+  animation: rise-in 0.35s ease both;
 }

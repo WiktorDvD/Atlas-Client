@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import type { ServerEntry } from '@shared/types'
+import logo from '../assets/logo.png'
 import { useApp } from '../stores/appStore'
 
 function formatBytes(value: number): string {
@@ -18,11 +20,18 @@ export function PlayPage() {
   const [offline, setOffline] = useState('')
   const [addStep, setAddStep] = useState<'idle' | 'choose' | 'offline'>('idle')
   const [starting, setStarting] = useState(false)
+  const [servers, setServers] = useState<ServerEntry[]>([])
   const closeAdd = () => {
     setOffline('')
     setAddStep('idle')
   }
+
+  useEffect(() => {
+    void window.lunar.listServers().then(setServers).catch(() => setServers([]))
+  }, [])
+
   if (!snap) return <div className="skel h-40 rounded-2xl" />
+
   const account = snap.accounts.find((item) => item.id === snap.activeAccountId)
   const launcherUpdateLabel =
     (snap.updater.phase === 'available' || snap.updater.phase === 'downloaded') && snap.updater.latestVersion
@@ -32,6 +41,7 @@ export function PlayPage() {
     setStarting(true)
     useApp.setState({ progress: null })
     try {
+      // ensureClientBeforePlay runs in main on launch — updates client automatically
       await window.lunar.startGame()
       toast('Game starting')
       if (snap.settings.showConsole) setPage('console')
@@ -43,133 +53,217 @@ export function PlayPage() {
     }
   }
   const downloading = starting && (Boolean(progress) || snap.client.kind === 'downloading')
-  const playLabel = snap.launch.running ? 'RUNNING' : downloading ? 'DOWNLOADING' : starting ? 'STARTING' : 'LAUNCH'
+  const playLabel = snap.launch.running
+    ? 'RUNNING'
+    : downloading
+      ? 'UPDATING'
+      : starting
+        ? 'STARTING'
+        : 'LAUNCH GAME'
+  const newsItems = snap.news.length
+    ? snap.news.slice(0, 4)
+    : [
+        {
+          title: 'Atlas Client',
+          body: snap.client.changelog || snap.client.message || 'Minecraft 1.8.9 · butter hitreg · sticky WASD'
+        }
+      ]
+
   return (
-    <div className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/5 bg-black/20">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(92,255,138,0.12),transparent_42%)]" />
-
-      <div className="relative flex items-start justify-between gap-4 px-8 pt-7">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">Home</p>
-          <h1 className="mt-1 text-4xl font-semibold tracking-tight">Lunar Remake</h1>
-          <p className="mt-2 max-w-xl text-sm text-[var(--muted)]">{snap.client.message || 'Minecraft 1.8.9 · Java 21 PVP kit'}</p>
-          {snap.updater.phase !== 'idle' ? (
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <p className="text-xs text-[var(--muted)]">{snap.updater.status}</p>
-              {launcherUpdateLabel ? (
-                <button
-                  className="rounded-full px-3 py-1 text-xs font-semibold text-[#07110a]"
-                  style={{ background: 'var(--accent)' }}
-                  onClick={() =>
-                    void window.lunar
-                      .installUpdate()
-                      .then((updater) => useApp.getState().applyUpdater(updater))
-                      .catch((error: unknown) => toast(error instanceof Error ? error.message : 'Could not install update'))
-                  }
-                >
-                  {launcherUpdateLabel}
-                </button>
-              ) : null}
-            </div>
-          ) : null}
-          {snap.updater.phase === 'downloading' ? (
-            <div className="mt-2 h-1 w-48 overflow-hidden rounded bg-white/10">
-              <div className="h-full" style={{ width: `${snap.updater.percent}%`, background: 'var(--accent)' }} />
-            </div>
-          ) : null}
-        </div>
-
-        <div className="glass flex items-center gap-3 rounded-2xl px-3 py-2">
-          {account ? (
-            <img alt="" className="h-11 w-11 rounded-xl" src={`https://mc-heads.net/avatar/${account.uuid}/64`} />
-          ) : (
-            <div className="h-11 w-11 rounded-xl bg-white/10" />
-          )}
-          <div>
-            <div className="text-sm font-semibold">{account?.username ?? 'No account'}</div>
-            <div className="text-xs text-[var(--muted)]">{account?.kind ?? 'Sign in to play'}</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="relative flex flex-1 flex-col items-center justify-center gap-4">
-        <motion.button
-          whileHover={{ scale: snap.launch.running || starting ? 1 : 1.05 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => void play()}
-          disabled={snap.launch.running || starting}
-          className="play-orb h-[88px] w-[280px] rounded-full text-xl font-bold tracking-[0.18em] text-[#07110a] disabled:opacity-70"
+    <div className="flex h-full min-h-0 gap-3">
+      <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-auto pr-0.5">
+        <motion.section
+          className="hero-banner relative overflow-hidden rounded-3xl border border-white/8"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.32 }}
         >
-          {playLabel}
-        </motion.button>
-        {progress ? (
-          <div className="w-80 text-center text-xs text-[var(--muted)]">
-            {progress.label} · {formatBytes(progress.speedBps)} · ETA {Math.ceil(progress.etaSeconds)}s
-            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/10">
-              <div
-                className="h-full rounded-full"
-                style={{
-                  width: `${progress.overallTotal ? (progress.overallReceived / progress.overallTotal) * 100 : 0}%`,
-                  background: 'var(--accent)'
-                }}
-              />
-            </div>
+          <div className="pointer-events-none absolute inset-0 opacity-50">
+            <div className="absolute -right-6 top-[-18%] h-72 w-72 rounded-full bg-[var(--accent)]/20 blur-3xl" />
+            <div className="absolute bottom-[-28%] left-[8%] h-56 w-56 rounded-full bg-[var(--accent-play)]/15 blur-3xl" />
           </div>
-        ) : (
-          <p className="text-xs text-[var(--muted)]">Version 1.8.9 · Zulu 21 · Badlion-like G1 PVP</p>
-        )}
-        <div className="flex gap-2">
+
+          <div className="relative flex min-h-[280px] flex-col items-center justify-center gap-5 px-6 py-10 text-center">
+            <img
+              src={logo}
+              alt="Atlas Client"
+              className="h-20 w-20 object-contain drop-shadow-[0_12px_28px_rgba(62,198,255,0.3)]"
+              draggable={false}
+            />
+            <div>
+              <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">Atlas Client</h1>
+              <p className="mt-2 text-sm text-white/60">
+                {snap.client.message || 'Minecraft 1.8.9 with OptiFine'}
+              </p>
+            </div>
+
+            {snap.updater.phase !== 'idle' ? (
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <p className="text-xs text-[var(--muted)]">{snap.updater.status}</p>
+                {launcherUpdateLabel ? (
+                  <button
+                    className="rounded-full px-3 py-1 text-xs font-semibold text-[#07110a]"
+                    style={{ background: 'var(--accent-play)' }}
+                    onClick={() =>
+                      void window.lunar
+                        .installUpdate()
+                        .then((updater) => useApp.getState().applyUpdater(updater))
+                        .catch((error: unknown) =>
+                          toast(error instanceof Error ? error.message : 'Could not install update')
+                        )
+                    }
+                  >
+                    {launcherUpdateLabel}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+            {snap.updater.phase === 'downloading' ? (
+              <div className="h-1 w-48 overflow-hidden rounded bg-white/10">
+                <div className="h-full" style={{ width: `${snap.updater.percent}%`, background: 'var(--accent-play)' }} />
+              </div>
+            ) : null}
+
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <div className="flex h-11 items-center rounded-full border border-white/12 bg-black/35 px-4 text-sm font-medium">
+                1.8.9
+              </div>
+              <button
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-black/35 text-[var(--muted)] transition hover:bg-white/8 hover:text-white"
+                title="Settings"
+                onClick={() => setPage('settings')}
+              >
+                ⚙
+              </button>
+              <motion.button
+                whileHover={{ scale: snap.launch.running || starting ? 1 : 1.05 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => void play()}
+                disabled={snap.launch.running || starting}
+                className="launch-btn h-14 min-w-[220px] rounded-full px-10 text-[15px] disabled:cursor-not-allowed"
+              >
+                {playLabel}
+              </motion.button>
+            </div>
+
+            {progress ? (
+              <div className="w-full max-w-md text-center text-xs text-[var(--muted)]">
+                Updating client · {progress.label} · {formatBytes(progress.speedBps)}
+                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${progress.overallTotal ? (progress.overallReceived / progress.overallTotal) * 100 : 0}%`,
+                      background: 'var(--accent-play)'
+                    }}
+                  />
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </motion.section>
+
+        <section className="rise-in flex items-center gap-2" style={{ animationDelay: '60ms' }}>
+          <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-0.5">
+            {servers.length === 0 ? (
+              <button
+                className="server-chip flex h-12 shrink-0 items-center gap-2 rounded-xl px-3 text-xs text-[var(--muted)]"
+                onClick={() => setPage('servers')}
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-sm">+</span>
+                Add servers
+              </button>
+            ) : (
+              servers.slice(0, 10).map((server) => (
+                <button
+                  key={server.id}
+                  className="server-chip flex h-12 shrink-0 items-center gap-2 rounded-xl px-2.5"
+                  title={`${server.name} · ${server.address}`}
+                  onClick={() => setPage('servers')}
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--accent)]/30 to-[var(--accent-play)]/20 text-xs font-bold">
+                    {server.name.slice(0, 2).toUpperCase()}
+                  </span>
+                  <span className="max-w-[88px] truncate text-xs font-medium">{server.name}</span>
+                </button>
+              ))
+            )}
+          </div>
           <button
-            className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10"
-            onClick={() =>
-              void window.lunar
-                .installClient()
-                .then(() => refresh())
-                .catch((error: unknown) => toast(error instanceof Error ? error.message : 'Download failed'))
-            }
+            className="server-chip flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-[var(--muted)]"
+            title="Edit servers"
+            onClick={() => setPage('servers')}
           >
-            {snap.client.kind === 'update' ? 'Update client' : 'Download client'}
+            ⚙
           </button>
-          <button
-            className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm hover:bg-white/10"
-            onClick={() =>
-              void window.lunar
-                .rollbackClient()
-                .then(() => refresh())
-                .catch((e: unknown) => toast(e instanceof Error ? e.message : 'Rollback failed'))
-            }
-          >
-            Rollback
-          </button>
-        </div>
+        </section>
+
+        <section className="rise-in" style={{ animationDelay: '110ms' }}>
+          <div className="mb-2 flex items-end justify-between">
+            <h2 className="text-sm font-semibold">Latest News</h2>
+            <span className="text-[11px] text-[var(--muted)]">{newsItems.length} update{newsItems.length === 1 ? '' : 's'}</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+            {newsItems.map((item, index) => (
+              <article key={`${item.title}-${index}`} className="news-card overflow-hidden rounded-xl">
+                <div
+                  className="relative h-20"
+                  style={{
+                    background: `linear-gradient(135deg, hsl(${185 + index * 24}, 60%, 28%), hsl(${150 + index * 18}, 45%, 16%))`
+                  }}
+                >
+                  {index === 0 ? (
+                    <span className="absolute left-2 top-2 h-2 w-2 rounded-full bg-[var(--accent-play)]" />
+                  ) : null}
+                </div>
+                <div className="p-3">
+                  <h3 className="truncate text-[12px] font-semibold">{item.title}</h3>
+                  <p className="mt-1 line-clamp-2 text-[10px] leading-relaxed text-[var(--muted)]">{item.body}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
       </div>
 
-      <div className="relative grid grid-cols-2 gap-4 px-6 pb-6">
-        <article className="glass rounded-2xl p-4">
-          <h2 className="text-sm font-semibold">News</h2>
-          <p className="mt-2 max-h-28 overflow-auto whitespace-pre-wrap text-xs leading-relaxed text-[var(--muted)]">
-            {snap.news[0]?.body || snap.client.changelog || 'No release notes yet.'}
-          </p>
-        </article>
-        <article className="glass rounded-2xl p-4">
+      <aside className="hidden w-[220px] shrink-0 flex-col gap-3 lg:flex">
+        <div className="glass rounded-2xl p-3">
+          <div className="flex items-center gap-3">
+            {account ? (
+              <img alt="" className="h-12 w-12 rounded-xl" src={`https://mc-heads.net/avatar/${account.uuid}/64`} />
+            ) : (
+              <div className="h-12 w-12 rounded-xl bg-white/10" />
+            )}
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold">{account?.username ?? 'No account'}</div>
+              <div className="flex items-center gap-1.5 text-[11px] text-[var(--muted)]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-play)]" />
+                {account?.kind ?? 'Sign in to play'}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="glass flex min-h-0 flex-1 flex-col rounded-2xl p-3">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold">Account</h2>
+            <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Accounts</h2>
             {addStep === 'idle' ? (
               <button
-                className="rounded-lg px-3 py-1 text-sm font-semibold text-[#07110a]"
-                style={{ background: 'var(--accent)' }}
+                className="rounded-md px-2 py-0.5 text-[11px] font-semibold text-[#07110a]"
+                style={{ background: 'var(--accent-play)' }}
                 onClick={() => setAddStep('choose')}
               >
                 Add
               </button>
             ) : (
-              <button className="rounded-full border border-white/15 px-3 py-1 text-xs" onClick={closeAdd}>
+              <button className="rounded-md border border-white/12 px-2 py-0.5 text-[11px]" onClick={closeAdd}>
                 Back
               </button>
             )}
           </div>
+
           {login?.state === 'waiting' || login?.state === 'starting' ? (
-            <p className="mt-2 text-sm">
+            <p className="mt-2 text-xs">
               {login.message}
               {login.code ? (
                 <>
@@ -179,16 +273,20 @@ export function PlayPage() {
               ) : null}
             </p>
           ) : null}
-          {login?.state === 'error' ? <p className="mt-2 text-sm text-red-300">{login.message}</p> : null}
-          {login?.state === 'success' ? <p className="mt-2 text-sm">{login.message}</p> : null}
+          {login?.state === 'error' ? <p className="mt-2 text-xs text-red-300">{login.message}</p> : null}
+          {login?.state === 'success' ? <p className="mt-2 text-xs">{login.message}</p> : null}
+
           {addStep === 'choose' ? (
-            <div className="mt-2 flex flex-wrap gap-2">
-              <button className="rounded-lg border border-white/15 px-3 py-1 text-sm" onClick={() => setAddStep('offline')}>
+            <div className="mt-2 flex flex-col gap-1.5">
+              <button
+                className="rounded-lg border border-white/12 px-2 py-1.5 text-left text-xs hover:bg-white/5"
+                onClick={() => setAddStep('offline')}
+              >
                 Offline account
               </button>
               <button
-                className="rounded-lg px-3 py-1 text-sm font-semibold text-[#07110a]"
-                style={{ background: 'var(--accent)' }}
+                className="rounded-lg px-2 py-1.5 text-left text-xs font-semibold text-[#07110a]"
+                style={{ background: 'var(--accent-play)' }}
                 onClick={() => {
                   closeAdd()
                   void window.lunar.startMicrosoft()
@@ -198,17 +296,18 @@ export function PlayPage() {
               </button>
             </div>
           ) : null}
+
           {addStep === 'offline' ? (
-            <div className="mt-2 flex gap-2">
+            <div className="mt-2 flex flex-col gap-1.5">
               <input
-                className="min-w-0 flex-1 rounded-lg border border-white/15 bg-transparent px-2 text-sm"
+                className="rounded-lg border border-white/12 bg-transparent px-2 py-1.5 text-xs"
                 placeholder="Username"
                 value={offline}
                 onChange={(event) => setOffline(event.target.value)}
               />
               <button
-                className="rounded-lg px-3 py-1 text-sm font-semibold text-[#07110a]"
-                style={{ background: 'var(--accent)' }}
+                className="rounded-lg px-2 py-1.5 text-xs font-semibold text-[#07110a]"
+                style={{ background: 'var(--accent-play)' }}
                 onClick={() =>
                   void window.lunar
                     .addOffline(offline)
@@ -223,19 +322,118 @@ export function PlayPage() {
               </button>
             </div>
           ) : null}
-          <div className="mt-2 flex flex-wrap gap-1">
-            {snap.accounts.map((item) => (
-              <button
-                key={item.id}
-                className="rounded-full bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
-                onClick={() => void window.lunar.selectAccount(item.id).then(() => refresh())}
-              >
-                {item.username}
-              </button>
-            ))}
+
+          <ul className="mt-2 space-y-1 overflow-auto">
+            {snap.accounts.length === 0 ? (
+              <li className="text-xs text-[var(--muted)]">No accounts yet.</li>
+            ) : (
+              snap.accounts.map((item) => (
+                <li key={item.id}>
+                  <button
+                    className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs transition hover:bg-white/5 ${
+                      item.id === snap.activeAccountId ? 'bg-white/8' : ''
+                    }`}
+                    onClick={() => void window.lunar.selectAccount(item.id).then(() => refresh())}
+                  >
+                    <img alt="" className="h-6 w-6 rounded-md" src={`https://mc-heads.net/avatar/${item.uuid}/32`} />
+                    <span className="truncate font-medium">{item.username}</span>
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
+
+        <button
+          className="glass rounded-2xl px-3 py-2.5 text-left text-xs text-[var(--muted)] transition hover:text-white"
+          onClick={() => setPage('settings')}
+        >
+          Open settings →
+        </button>
+      </aside>
+
+      <aside className="glass flex w-[180px] shrink-0 flex-col gap-2 overflow-auto rounded-2xl p-3 lg:hidden">
+        <div className="flex items-center gap-2">
+          {account ? (
+            <img alt="" className="h-9 w-9 rounded-lg" src={`https://mc-heads.net/avatar/${account.uuid}/64`} />
+          ) : (
+            <div className="h-9 w-9 rounded-lg bg-white/10" />
+          )}
+          <div className="min-w-0">
+            <div className="truncate text-xs font-semibold">{account?.username ?? 'No account'}</div>
+            <div className="text-[10px] text-[var(--muted)]">{account?.kind ?? 'Sign in'}</div>
           </div>
-        </article>
-      </div>
+        </div>
+        {addStep === 'idle' ? (
+          <button
+            className="rounded-md px-2 py-1 text-[11px] font-semibold text-[#07110a]"
+            style={{ background: 'var(--accent-play)' }}
+            onClick={() => setAddStep('choose')}
+          >
+            Add account
+          </button>
+        ) : (
+          <button className="rounded-md border border-white/12 px-2 py-1 text-[11px]" onClick={closeAdd}>
+            Back
+          </button>
+        )}
+        {addStep === 'choose' ? (
+          <div className="flex flex-col gap-1">
+            <button
+              className="rounded-lg border border-white/12 px-2 py-1 text-left text-[11px]"
+              onClick={() => setAddStep('offline')}
+            >
+              Offline
+            </button>
+            <button
+              className="rounded-lg px-2 py-1 text-left text-[11px] font-semibold text-[#07110a]"
+              style={{ background: 'var(--accent-play)' }}
+              onClick={() => {
+                closeAdd()
+                void window.lunar.startMicrosoft()
+              }}
+            >
+              Microsoft
+            </button>
+          </div>
+        ) : null}
+        {addStep === 'offline' ? (
+          <div className="flex flex-col gap-1">
+            <input
+              className="rounded-lg border border-white/12 bg-transparent px-2 py-1 text-[11px]"
+              placeholder="Username"
+              value={offline}
+              onChange={(event) => setOffline(event.target.value)}
+            />
+            <button
+              className="rounded-lg px-2 py-1 text-[11px] font-semibold text-[#07110a]"
+              style={{ background: 'var(--accent-play)' }}
+              onClick={() =>
+                void window.lunar
+                  .addOffline(offline)
+                  .then(() => {
+                    closeAdd()
+                    return refresh()
+                  })
+                  .catch((error: unknown) => toast(error instanceof Error ? error.message : 'Could not add account'))
+              }
+            >
+              Confirm
+            </button>
+          </div>
+        ) : null}
+        <div className="flex flex-wrap gap-1">
+          {snap.accounts.map((item) => (
+            <button
+              key={item.id}
+              className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] hover:bg-white/10"
+              onClick={() => void window.lunar.selectAccount(item.id).then(() => refresh())}
+            >
+              {item.username}
+            </button>
+          ))}
+        </div>
+      </aside>
     </div>
   )
 }
