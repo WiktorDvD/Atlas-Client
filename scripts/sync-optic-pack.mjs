@@ -1,5 +1,7 @@
 /**
  * Copy Wiktor's live PvP overlay into resources/optic for electron-builder.
+ * If the live source jar is missing but resources/optic is already populated
+ * (e.g. CI after commit), keep the committed pack and exit 0.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -8,6 +10,7 @@ import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(__dirname, '..')
 const dest = path.join(root, 'resources', 'optic')
+const destJar = path.join(dest, 'lunar-localpatches.jar')
 
 const appData = process.env.APPDATA || ''
 const libs = path.join(appData, '.lunar-remake', 'versions', '1.0.12', 'libs')
@@ -22,6 +25,10 @@ function copyFile(src, out) {
 }
 
 if (!fs.existsSync(patchJar)) {
+  if (fs.existsSync(destJar)) {
+    console.log('Live patch jar missing; keeping committed Optic pack ->', dest)
+    process.exit(0)
+  }
   console.error('Missing patched jar:', patchJar)
   console.error('Run client-patches\\build.ps1 first, then launch once.')
   process.exit(1)
