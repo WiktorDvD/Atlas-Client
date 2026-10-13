@@ -1,39 +1,26 @@
-# Lunar Remake Launcher
+# Optic
 
-Fork of **Lunar Revamped** with default **Azul Zulu Java 25** PVP kit for Minecraft **1.8.9**.
+Optic is the default launcher for [WiktorDvD/Atlas-Client](https://github.com/WiktorDvD/Atlas-Client).
 
-## Setup
+**Install:** download [`Optic.exe`](https://github.com/WiktorDvD/Atlas-Client/releases/latest/download/Optic.exe) from the latest GitHub release.
 
-```bash
-npm install
-```
+**Play updates:** pressing Play checks this repo and downloads newer game client builds (`Atlas-Client-*.zip`) before launch. The Optic hitreg / visual pack is applied automatically.
+
+**Launcher updates:** installed copies check this repo for newer `Optic.exe` builds.
 
 ## Dev
 
 ```bash
+npm install
+npm run sync:optic
+npm run sync:pvp-java
 npm run dev
 ```
 
-Settings → Dev runtime can point at a client remake checkout so Play works before a client release is published.
-
-## Build
+## Release launcher
 
 ```bash
-npm run dist
+node scripts/release-launcher.mjs --version X.Y.Z --push
 ```
 
-Output: `release/LunarRemakeSetup.exe`
-
-## Data
-
-`%APPDATA%\.lunar-remake\`
-
-## Java
-
-Ships `resources/mc-pvp-java25` (timer agent + forwarder). On first launch it installs **Zulu 25** into:
-
-`%APPDATA%\.lunar-remake\runtimes\zulu-25\`
-
-If `Desktop\Wikky\Javaas\java25` already exists, that copy is used (no download).
-
-Default JVM preset is **pvp** (G1 low-pause). Use preset **zgc** only if you want ZGC instead.
+CI builds and publishes `Optic.exe` on tag `vX.Y.Z`.

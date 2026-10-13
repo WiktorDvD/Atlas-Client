@@ -14,7 +14,7 @@ export function TitleBar() {
       <div className="flex min-w-0 items-center gap-2.5">
         <img src={logo} alt="" className="h-7 w-7 object-contain" draggable={false} />
         <span className="text-[11px] font-semibold tracking-[0.08em] text-white/45">
-          Atlas Client <span className="text-white/25">›</span> Launchpad
+          Optic <span className="text-white/25">›</span> Launchpad
         </span>
         {account ? (
           <div className="hidden items-center gap-2 sm:flex">

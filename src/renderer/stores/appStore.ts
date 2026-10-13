@@ -6,7 +6,7 @@ interface Toast {
   text: string
 }
 
-export type AppPage = 'play' | 'instances' | 'servers' | 'skins' | 'settings' | 'console'
+export type AppPage = 'home' | 'play' | 'instances' | 'servers' | 'skins' | 'settings' | 'console'
 
 interface AppState {
   snap: AppSnapshot | null
@@ -16,11 +16,16 @@ interface AppState {
   progress: DownloadProgress | null
   login: MicrosoftLoginState | null
   consoleLines: ConsoleLine[]
+  accountMenuNonce: number
+  friendsOpen: boolean
   setPage: (page: AppPage) => void
   toast: (text: string) => void
   refresh: () => Promise<void>
   pushConsole: (line: ConsoleLine) => void
   applyUpdater: (updater: UpdaterState) => void
+  openAccountMenu: () => void
+  setFriendsOpen: (open: boolean) => void
+  toggleFriends: () => void
 }
 
 let toastId = 1
@@ -29,13 +34,18 @@ let pendingUpdater: UpdaterState | null = null
 
 export const useApp = create<AppState>((set, get) => ({
   snap: null,
-  page: 'play',
+  page: 'home',
   loading: true,
   toasts: [],
   progress: null,
   login: null,
   consoleLines: [],
+  accountMenuNonce: 0,
+  friendsOpen: false,
   setPage: (page) => set({ page }),
+  openAccountMenu: () => set({ accountMenuNonce: get().accountMenuNonce + 1 }),
+  setFriendsOpen: (open) => set({ friendsOpen: open }),
+  toggleFriends: () => set({ friendsOpen: !get().friendsOpen }),
   toast: (text) => {
     const id = toastId++
     set({ toasts: [...get().toasts, { id, text }] })

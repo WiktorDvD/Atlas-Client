@@ -47,7 +47,10 @@ export function defaultSettings(): LaunchSettings {
     postExit: '',
     wrapper: '',
     closeOnLaunch: false,
-    showConsole: true,
+    showConsole: false,
+    debugMode: false,
+    backupLauncherSettings: false,
+    backupGameSettings: false,
     keepOpen: true,
     onLaunch: 'stay',
     javaPath,
@@ -160,9 +163,21 @@ export function loadStore(): Persisted {
     }
   })
   const defaults = defaultSettings()
-  raw.settings = { ...defaults, ...raw.settings }
-  // Force Atlas blue if still on older launcher accents.
-  if (!raw.settings.accent || raw.settings.accent === '#5cff8a' || raw.settings.accent === '#1eb8ef') {
+  const diskSettings = { ...(raw.settings as LaunchSettings) }
+  const hadDebugMode = Object.prototype.hasOwnProperty.call(diskSettings, 'debugMode')
+  raw.settings = { ...defaults, ...diskSettings }
+  // First boot after debugMode landed: stop opening console by default.
+  if (!hadDebugMode) {
+    raw.settings.debugMode = false
+    raw.settings.showConsole = false
+    migrated = true
+  }
+  // Force Optic lime if still on older launcher accents.
+  if (
+    !raw.settings.accent ||
+    raw.settings.accent === '#3ec6ff' ||
+    raw.settings.accent === '#1eb8ef'
+  ) {
     raw.settings.accent = DEFAULT_ACCENT
     migrated = true
   }

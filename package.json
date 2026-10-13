@@ -1,8 +1,8 @@
 {
-  "name": "atlas-client-launcher",
-  "version": "1.0.0",
+  "name": "optic-launcher",
+  "version": "1.2.0",
   "private": true,
-  "description": "Atlas Client — Lunar Remake 1.8.9 with Wiktor's hitreg / visual pack",
+  "description": "Optic — Lunar Remake 1.8.9 with Wiktor's hitreg / visual pack",
   "repository": {
     "type": "git",
     "url": "https://github.com/WiktorDvD/Atlas-Client.git"
@@ -16,8 +16,8 @@
     "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.json --noEmit",
     "dev": "npm run build:main && concurrently -k \"vite\" \"wait-on http://127.0.0.1:5173 && cross-env ELECTRON_DEV=1 electron .\"",
     "start": "npm run build && electron .",
-    "sync:atlas": "node scripts/sync-atlas-pack.mjs",
-    "dist": "npm run sync:atlas && npm run build && electron-builder --win",
+    "sync:optic": "node scripts/sync-optic-pack.mjs",
+    "dist": "npm run sync:optic && npm run build && electron-builder --win",
     "release:launcher": "node scripts/release-launcher.mjs",
     "sync:pvp-java": "node scripts/sync-pvp-java-resources.mjs",
     "lint": "eslint src --ext .ts,.tsx",

@@ -12,6 +12,7 @@ import type {
   MicrosoftLoginState,
   ModEntry,
   ServerEntry,
+  SkinEntry,
   SkinInfo,
   UpdaterState
 } from '../shared/types'
@@ -43,11 +44,12 @@ export interface LunarApi {
   installClient: () => Promise<ClientStatus>
   rollbackClient: () => Promise<ClientStatus>
   preview: () => Promise<CommandPreview>
-  startGame: () => Promise<LaunchState>
+  startGame: (joinServer?: string) => Promise<LaunchState>
   stopGame: () => Promise<void>
   consoleLog: () => Promise<ConsoleLine[]>
   copyCrash: () => Promise<string>
   openCrash: () => Promise<string>
+  openGameFiles: () => Promise<string>
   createInstance: (name: string) => Promise<Instance>
   deleteInstance: (id: string) => Promise<void>
   selectInstance: (id: string) => Promise<void>
@@ -56,11 +58,20 @@ export interface LunarApi {
   listServers: () => Promise<ServerEntry[]>
   addServer: (name: string, address: string) => Promise<ServerEntry[]>
   removeServer: (id: string) => Promise<ServerEntry[]>
+  chooseServerIcon: (id: string) => Promise<ServerEntry[]>
   skinInfo: () => Promise<SkinInfo>
   chooseSkin: () => Promise<SkinInfo>
+  listSkins: () => Promise<SkinEntry[]>
+  addSkinByIgn: (ign: string) => Promise<SkinEntry[]>
+  addSkinByPng: () => Promise<SkinEntry[]>
+  removeSkin: (id: string) => Promise<SkinEntry[]>
+  selectSkin: (id: string) => Promise<SkinEntry[]>
   checkUpdate: () => Promise<UpdaterState>
   installUpdate: () => Promise<UpdaterState>
   openUpdateDownload: () => Promise<void>
+  backupLauncherSettings: () => Promise<string>
+  backupGameSettings: () => Promise<string>
+  openBackupsFolder: () => Promise<string>
   on: (channel: string, listener: (payload: unknown) => void) => () => void
 }
 
@@ -86,11 +97,12 @@ const api: LunarApi = {
   installClient: () => call('client:install'),
   rollbackClient: () => call('client:rollback'),
   preview: () => call('launch:preview'),
-  startGame: () => call('launch:start'),
+  startGame: (joinServer) => call('launch:start', joinServer),
   stopGame: () => call('launch:stop'),
   consoleLog: () => call('launch:log'),
   copyCrash: () => call('launch:copyCrash'),
   openCrash: () => call('launch:openCrash'),
+  openGameFiles: () => call('files:openGameDir'),
   createInstance: (name) => call('instances:create', name),
   deleteInstance: (id) => call('instances:delete', id),
   selectInstance: (id) => call('instances:select', id),
@@ -99,11 +111,20 @@ const api: LunarApi = {
   listServers: () => call('servers:list'),
   addServer: (name, address) => call('servers:add', name, address),
   removeServer: (id) => call('servers:remove', id),
+  chooseServerIcon: (id) => call('servers:chooseIcon', id),
   skinInfo: () => call('skins:info'),
   chooseSkin: () => call('skins:choose'),
+  listSkins: () => call('skins:list'),
+  addSkinByIgn: (ign) => call('skins:addIgn', ign),
+  addSkinByPng: () => call('skins:addPng'),
+  removeSkin: (id) => call('skins:remove', id),
+  selectSkin: (id) => call('skins:select', id),
   checkUpdate: () => call('updater:check'),
   installUpdate: () => call('updater:install'),
   openUpdateDownload: () => call('updater:open'),
+  backupLauncherSettings: () => call('backup:launcher'),
+  backupGameSettings: () => call('backup:game'),
+  openBackupsFolder: () => call('backup:open'),
   on: (channel, listener) => {
     const wrapped = (_event: IpcRendererEvent, payload: unknown) => listener(payload)
     ipcRenderer.on(channel, wrapped)

@@ -1,8 +1,9 @@
 /**
- * Bump launcher version, commit, tag, and push so CI publishes LunarRevampedSetup.exe.
+ * Bump Optic launcher version, commit, tag, and push so CI publishes Optic.exe
+ * to WiktorDvD/Atlas-Client.
  *
- *   node scripts/release-launcher.mjs --version 1.0.7 --push
- *   node scripts/release-launcher.mjs --version 1.0.7          # bump only
+ *   node scripts/release-launcher.mjs --version 1.2.0 --push
+ *   node scripts/release-launcher.mjs --version 1.2.0          # bump only
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -63,4 +64,4 @@ run('git', ['commit', '-m', `Release ${version}.`])
 run('git', ['tag', `v${version}`])
 run('git', ['push', 'origin', 'HEAD'])
 run('git', ['push', 'origin', `v${version}`])
-console.log(`Pushed v${version}. CI should publish LunarRevampedSetup.exe.`)
+console.log(`Pushed v${version}. CI should publish Optic.exe to Atlas-Client.`)

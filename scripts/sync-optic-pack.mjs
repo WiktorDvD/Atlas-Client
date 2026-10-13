@@ -1,6 +1,5 @@
 /**
- * Copy Wiktor's live PvP overlay (localpatches + Lunar Icons) into
- * resources/atlas-client for electron-builder.
+ * Copy Wiktor's live PvP overlay into resources/optic for electron-builder.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -8,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(__dirname, '..')
-const dest = path.join(root, 'resources', 'atlas-client')
+const dest = path.join(root, 'resources', 'optic')
 
 const appData = process.env.APPDATA || ''
 const libs = path.join(appData, '.lunar-remake', 'versions', '1.0.12', 'libs')
@@ -54,9 +53,9 @@ fs.writeFileSync(
   path.join(dest, 'pack.json'),
   JSON.stringify(
     {
-      id: 'atlas-client',
-      name: 'Atlas Client',
-      version: '1.0.5',
+      id: 'optic',
+      name: 'Optic',
+      version: '1.0.0',
       builtAt: new Date().toISOString(),
       includes: [
         'Butter AttackScheduler (absolute 50ms grid)',
@@ -72,4 +71,4 @@ fs.writeFileSync(
   'utf8'
 )
 
-console.log('Atlas Client pack synced ->', dest)
+console.log('Optic pack synced ->', dest)

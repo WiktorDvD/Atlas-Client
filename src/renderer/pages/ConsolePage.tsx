@@ -12,7 +12,7 @@ export function ConsolePage() {
   }, [])
   const text = lines.map((line) => line.text).join('\n')
   return (
-    <section className="glass flex h-full flex-col rounded-3xl p-4">
+    <section className="cb-card flex h-full flex-col p-4">
       <div className="mb-2 flex gap-2">
         <button className="rounded-lg border border-white/15 px-3 py-1 text-sm" onClick={() => void navigator.clipboard.writeText(text)}>Copy log</button>
         <button className="rounded-lg border border-white/15 px-3 py-1 text-sm" onClick={() => void window.lunar.openCrash().catch((e: unknown) => toast(e instanceof Error ? e.message : 'No crash report'))}>Open crash report</button>

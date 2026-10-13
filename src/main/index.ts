@@ -12,7 +12,7 @@ app.whenReady().then(() => {
   try {
     loadStore()
   } catch (error) {
-    console.error('[Atlas] loadStore failed, using empty defaults', error)
+    console.error('[Optic] loadStore failed, using empty defaults', error)
   }
   registerIpc()
   createWindow()

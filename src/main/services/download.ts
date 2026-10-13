@@ -361,20 +361,40 @@ export function runtimeRoot(): string {
 let cachedNewsItems: NewsItem[] = []
 let remoteRefreshScheduled = false
 
+function newsItemFromRelease(release: GithubRelease): NewsItem {
+  return {
+    title: release.tag_name ?? 'Update',
+    body: (release.body ?? '').trim() || 'No notes for this release.',
+    url: release.html_url ?? '',
+    publishedAt: release.published_at ?? ''
+  }
+}
+
 function newsFromRelease(release: GithubRelease | null): NewsItem[] {
   if (!release) return []
-  return [
-    {
-      title: release.tag_name ?? 'Client',
-      body: release.body ?? 'No notes.',
-      url: release.html_url ?? '',
-      publishedAt: release.published_at ?? ''
-    }
-  ]
+  return [newsItemFromRelease(release)]
 }
 
 function rememberRelease(release: GithubRelease | null): void {
   cachedNewsItems = newsFromRelease(release)
+  if (release && releaseCache?.repo) {
+    void refreshNewsFeed(releaseCache.repo).catch(() => undefined)
+  }
+}
+
+async function refreshNewsFeed(repo: string): Promise<void> {
+  try {
+    const response = await fetch(
+      `https://api.github.com/repos/${CLIENT_OWNER}/${repo}/releases?per_page=8`,
+      { headers: githubApiHeaders() }
+    )
+    if (!response.ok) return
+    const releases = (await response.json()) as GithubRelease[]
+    if (!Array.isArray(releases) || releases.length === 0) return
+    cachedNewsItems = releases.map(newsItemFromRelease)
+  } catch {
+    /* keep single-item cache */
+  }
 }
 
 function statusFromLocal(remote = '', changelog = '', errorMessage = ''): ClientStatus {

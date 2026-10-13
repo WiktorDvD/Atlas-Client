@@ -34,8 +34,8 @@ export function createWindow(): BrowserWindow {
     minHeight: 560,
     frame: false,
     roundedCorners: true,
-    backgroundColor: '#07090e',
-    title: 'Atlas Client',
+    backgroundColor: '#08080a',
+    title: 'Optic',
     icon: icon.isEmpty() ? undefined : icon,
     show: false,
     webPreferences: {
@@ -99,7 +99,7 @@ export function ensureTray(): void {
     image = image.resize({ width: 16, height: 16 })
   }
   tray = new Tray(image)
-  tray.setToolTip('Atlas Client')
+  tray.setToolTip('Optic')
   tray.setContextMenu(
     Menu.buildFromTemplate([
       { label: 'Show', click: () => mainWindow?.show() },

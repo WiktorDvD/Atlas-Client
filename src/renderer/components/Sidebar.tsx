@@ -3,11 +3,10 @@ import type { AppPage } from '../stores/appStore'
 
 const items: { id: AppPage; label: string; icon: string }[] = [
   { id: 'play', label: 'Home', icon: '🚀' },
-  { id: 'instances', label: 'Profiles', icon: '🎮' },
   { id: 'servers', label: 'Servers', icon: '🌐' },
   { id: 'skins', label: 'Skins', icon: '👕' },
-  { id: 'console', label: 'Console', icon: '💻' },
-  { id: 'settings', label: 'Settings', icon: '⚙️' }
+  { id: 'settings', label: 'Settings', icon: '⚙' },
+  { id: 'console', label: 'Console', icon: '💻' }
 ]
 
 export function Sidebar(props: { page: AppPage; onChange: (page: AppPage) => void }) {
@@ -16,11 +15,11 @@ export function Sidebar(props: { page: AppPage; onChange: (page: AppPage) => voi
       <div className="mb-3 flex flex-col items-center gap-1 px-1">
         <img
           src={logo}
-          alt="Atlas Client"
+          alt="Optic"
           className="h-12 w-12 object-contain drop-shadow-[0_0_18px_rgba(62,198,255,0.35)]"
           draggable={false}
         />
-        <span className="text-[9px] font-semibold tracking-[0.16em] text-[var(--muted)]">ATLAS</span>
+        <span className="text-[9px] font-semibold tracking-[0.16em] text-[var(--muted)]">OPTIC</span>
       </div>
       {items.map((item) => {
         const active = props.page === item.id

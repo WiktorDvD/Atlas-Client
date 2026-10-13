@@ -1,6 +1,7 @@
-import { StrictMode, useEffect } from 'react'
+import { StrictMode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
+import { SplashScreen } from './components/SplashScreen'
 import './index.css'
 import { IpcChannel } from '@shared/ipc'
 import { useApp } from './stores/appStore'
@@ -9,6 +10,10 @@ import type { ConsoleLine, DownloadProgress, LaunchState, MicrosoftLoginState, U
 function Boot() {
   const refresh = useApp((s) => s.refresh)
   const pushConsole = useApp((s) => s.pushConsole)
+  const loading = useApp((s) => s.loading)
+  const [splashDone, setSplashDone] = useState(false)
+  const showSplash = !splashDone
+
   useEffect(() => {
     if (!window.lunar) return
     void refresh()
@@ -39,8 +44,25 @@ function Boot() {
     ]
     return () => offs.forEach((off) => off())
   }, [refresh, pushConsole])
-  return <App />
+
+  // Keep splash up until both animation and first snapshot finish.
+  const revealApp = splashDone && !loading
+
+  return (
+    <>
+      {showSplash ? <SplashScreen onDone={() => setSplashDone(true)} /> : null}
+      <div className={revealApp ? 'boot-app-in' : 'boot-app-hidden'} aria-hidden={!revealApp}>
+        <App />
+      </div>
+    </>
+  )
 }
 
 const root = document.getElementById('root')
-if (root) createRoot(root).render(<StrictMode><Boot /></StrictMode>)
+if (root) {
+  createRoot(root).render(
+    <StrictMode>
+      <Boot />
+    </StrictMode>
+  )
+}

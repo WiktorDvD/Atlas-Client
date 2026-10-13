@@ -3,8 +3,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { folders } from '../paths'
 
-const PACK_ID = 'atlas-client'
-const MARKER = 'atlas-client.version'
+const PACK_ID = 'optic'
+const MARKER = 'optic.version'
 
 function packRoot(): string {
   if (app.isPackaged) {
@@ -30,12 +30,8 @@ function readPackVersion(root: string): string {
   }
 }
 
-/**
- * Deploy Wiktor's patched localpatches + Lunar Icons into the installed
- * Lunar Remake runtime so friends get the same hitreg/visual pack.
- * Safe to call every launch; skips work when already current.
- */
-export function applyAtlasPack(): void {
+/** Deploy Optic hitreg/visual pack into the installed Lunar Remake runtime. */
+export function applyOpticPack(): void {
   const root = packRoot()
   const jarSrc = path.join(root, 'lunar-localpatches.jar')
   if (!fs.existsSync(jarSrc)) return
@@ -80,6 +76,6 @@ export function applyAtlasPack(): void {
   }
 
   if (applied > 0) {
-    console.log(`[Atlas] applied PvP pack ${packVer} to ${applied} runtime(s)`)
+    console.log(`[Optic] applied PvP pack ${packVer} to ${applied} runtime(s)`)
   }
 }

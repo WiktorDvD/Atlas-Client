@@ -22,11 +22,18 @@ import {
 } from './services/download'
 import { createInstance, deleteInstance, listInstances, patchInstanceSettings, selectInstance } from './services/instances'
 import { listJava, memoryMb, testJava } from './services/java'
+import {
+  backupGameSettingsNow,
+  backupLauncherSettingsNow,
+  openBackupsFolder,
+  runLaunchBackups
+} from './services/backup'
 import { consoleLines, launchState, previewCommand, startGame, stopGame } from './services/launch'
 import { listMods, setModEnabled } from './services/mods'
-import { addServer, listServers, removeServer } from './services/servers'
-import { chooseSkin, skinInfo } from './services/skins'
+import { addServer, chooseServerIcon, listServers, removeServer } from './services/servers'
+import { addSkinByIgn, addSkinByPng, chooseSkin, listSkins, removeSkin, selectSkin, skinInfo } from './services/skins'
 import { checkLauncherUpdate, installLauncherUpdate, openUpdateDownload, updaterState } from './services/updater'
+import { resolveGameDir } from './paths'
 import { loadStore, updateStore } from './store'
 import { applyLaunchBehavior, markQuitting, windowAction } from './window'
 
@@ -61,24 +68,28 @@ function wrap<T>(fn: () => Promise<T> | T): Promise<{ ok: true; data: T } | { ok
 
 let launchTask: Promise<LaunchState> | null = null
 
-function startLaunch(): Promise<LaunchState> {
+function startLaunch(joinServer?: string): Promise<LaunchState> {
   if (launchTask) return launchTask
-  launchTask = runLaunch().finally(() => {
+  launchTask = runLaunch(joinServer).finally(() => {
     launchTask = null
   })
   return launchTask
 }
 
-async function runLaunch(): Promise<LaunchState> {
+async function runLaunch(joinServer?: string): Promise<LaunchState> {
   const prepared = await ensureClientBeforePlay()
   if (prepared.warning) emit(IpcChannel.toast, prepared.warning)
-  const state = await startGame()
+  for (const note of runLaunchBackups()) {
+    emit(IpcChannel.console, { stream: 'launcher', text: note, at: Date.now() })
+  }
+  const state = await startGame(joinServer)
   const settings = loadStore().settings
   if (settings.closeOnLaunch && !settings.keepOpen) {
     markQuitting()
     setTimeout(() => app.quit(), 500)
   } else if (settings.onLaunch !== 'stay') applyLaunchBehavior()
-  if (settings.showConsole) emit(IpcChannel.console, { stream: 'launcher', text: 'Console attached.', at: Date.now() })
+  const debug = settings.debugMode || settings.showConsole
+  if (debug) emit(IpcChannel.console, { stream: 'launcher', text: 'Debug console attached.', at: Date.now() })
   return state
 }
 
@@ -95,9 +106,22 @@ export function registerIpc(): void {
   ipcMain.handle('settings:save', (_e, settings: LaunchSettings) =>
     wrap(() => {
       updateStore((data) => {
-        data.settings = { ...data.settings, ...settings }
+        const next = { ...data.settings, ...settings }
+        // Keep showConsole in sync with debugMode for older call sites.
+        if (typeof settings.debugMode === 'boolean') next.showConsole = settings.debugMode
+        data.settings = next
       })
       return loadStore().settings
+    })
+  )
+  ipcMain.handle('backup:launcher', () => wrap(() => backupLauncherSettingsNow()))
+  ipcMain.handle('backup:game', () => wrap(() => backupGameSettingsNow()))
+  ipcMain.handle('backup:open', () =>
+    wrap(async () => {
+      const dir = openBackupsFolder()
+      const err = await shell.openPath(dir)
+      if (err) throw new Error(err)
+      return dir
     })
   )
   ipcMain.handle('settings:instance', (_e, id: string, settings: Partial<LaunchSettings>) =>
@@ -114,7 +138,7 @@ export function registerIpc(): void {
   ipcMain.handle('client:install', () => wrap(() => installLatestClient()))
   ipcMain.handle('client:rollback', () => wrap(() => rollbackClient()))
   ipcMain.handle('launch:preview', () => wrap(() => previewCommand()))
-  ipcMain.handle('launch:start', () => wrap(() => startLaunch()))
+  ipcMain.handle('launch:start', (_e, joinServer?: string) => wrap(() => startLaunch(joinServer)))
   ipcMain.handle('launch:stop', () => wrap(() => stopGame()))
   ipcMain.handle('launch:log', () => wrap(() => consoleLines()))
   ipcMain.handle('launch:copyCrash', () =>
@@ -132,6 +156,17 @@ export function registerIpc(): void {
       return crash
     })
   )
+  ipcMain.handle('files:openGameDir', () =>
+    wrap(async () => {
+      const data = loadStore()
+      const instance = data.instances.find((item) => item.id === data.activeInstanceId)
+      const settings = { ...data.settings, ...instance?.settings }
+      const gameDir = resolveGameDir(data.activeInstanceId, settings.gameDir)
+      const err = await shell.openPath(gameDir)
+      if (err) throw new Error(err)
+      return gameDir
+    })
+  )
   ipcMain.handle('instances:create', (_e, name: string) => wrap(() => createInstance(name)))
   ipcMain.handle('instances:delete', (_e, id: string) => wrap(() => deleteInstance(id)))
   ipcMain.handle('instances:select', (_e, id: string) => wrap(() => selectInstance(id)))
@@ -140,8 +175,14 @@ export function registerIpc(): void {
   ipcMain.handle('servers:list', () => wrap(() => listServers()))
   ipcMain.handle('servers:add', (_e, name: string, address: string) => wrap(() => addServer(name, address)))
   ipcMain.handle('servers:remove', (_e, id: string) => wrap(() => removeServer(id)))
+  ipcMain.handle('servers:chooseIcon', (_e, id: string) => wrap(() => chooseServerIcon(id)))
   ipcMain.handle('skins:info', () => wrap(() => skinInfo()))
   ipcMain.handle('skins:choose', () => wrap(() => chooseSkin()))
+  ipcMain.handle('skins:list', () => wrap(() => listSkins()))
+  ipcMain.handle('skins:addIgn', (_e, ign: string) => wrap(() => addSkinByIgn(ign)))
+  ipcMain.handle('skins:addPng', () => wrap(() => addSkinByPng()))
+  ipcMain.handle('skins:remove', (_e, id: string) => wrap(() => removeSkin(id)))
+  ipcMain.handle('skins:select', (_e, id: string) => wrap(() => selectSkin(id)))
   ipcMain.handle('updater:check', () => wrap(() => checkLauncherUpdate(true)))
   ipcMain.handle('updater:install', () => wrap(() => installLauncherUpdate()))
   ipcMain.handle('updater:open', () => wrap(() => openUpdateDownload()))

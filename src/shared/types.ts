@@ -45,6 +45,12 @@ export interface LaunchSettings {
   wrapper: string
   closeOnLaunch: boolean
   showConsole: boolean
+  /** When true, Play opens the console (debug launch). */
+  debugMode: boolean
+  /** Copy launcher settings.json into backups/ before launch. */
+  backupLauncherSettings: boolean
+  /** Copy game options files into backups/ before launch. */
+  backupGameSettings: boolean
   keepOpen: boolean
   onLaunch: OnLaunchBehavior
   javaPath: string
@@ -109,6 +115,10 @@ export interface ServerEntry {
   id: string
   name: string
   address: string
+  /** Bundled or custom icon filename key. */
+  iconKey?: string
+  /** data: URL for UI display. */
+  iconUrl?: string
 }
 
 export interface SkinInfo {
@@ -116,6 +126,22 @@ export interface SkinInfo {
   uuid: string
   localPath: string
   remoteUrl: string
+}
+
+export type SkinSource = 'ign' | 'png'
+
+export interface SkinEntry {
+  id: string
+  name: string
+  source: SkinSource
+  /** Minecraft IGN when source is ign. */
+  ign?: string
+  /** Absolute path to saved PNG on disk. */
+  localPath: string
+  /** Preview URL for UI (file:// or https). */
+  previewUrl: string
+  /** True when this skin is applied to the active account. */
+  active: boolean
 }
 
 export interface ConsoleLine {

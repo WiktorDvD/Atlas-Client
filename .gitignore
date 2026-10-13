@@ -15,3 +15,5 @@ out
 smoke-*.txt
 resources/mc-pvp-java21
 resources/mc-pvp-java25
+
+release-ui/

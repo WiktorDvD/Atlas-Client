@@ -39,3 +39,10 @@ export function bundledPvpJavaPath(): string {
 export function instanceRoot(id: string): string {
   return ensureDir(path.join(folders.instances(), id))
 }
+
+/** Active instance Minecraft game directory (creates it if missing). */
+export function resolveGameDir(activeInstanceId: string, customGameDir?: string): string {
+  const custom = customGameDir?.trim()
+  if (custom) return ensureDir(custom)
+  return ensureDir(path.join(instanceRoot(activeInstanceId), 'game'))
+}

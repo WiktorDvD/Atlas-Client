@@ -1,6 +1,6 @@
 import type { JvmPreset } from './types'
 
-export const DEFAULT_ACCENT = '#3ec6ff'
+export const DEFAULT_ACCENT = '#5cff8a'
 
 /** Lunar 1.8.9 + Ichor/Genesis sweet spot: enough heap, not so large that G1 pauses stretch. */
 export const OPTIMAL_GAME_RAM_MB = 4096

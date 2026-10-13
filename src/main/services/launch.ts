@@ -20,7 +20,7 @@ import { ensureJava } from './java'
 import { extractNatives } from './natives'
 import { startLocalServices } from './fakeServices'
 import { applyPvpFeelProfile } from './pvpFeel'
-import { applyAtlasPack } from './atlasPack'
+import { applyOpticPack } from './opticPack'
 
 const VANILLA_LIBS = [
   'oshi-project/oshi-core/1.1/oshi-core-1.1.jar',
@@ -232,7 +232,7 @@ async function buildPlan(prepare: boolean): Promise<Plan> {
   fs.mkdirSync(logs, { recursive: true })
   fs.mkdirSync(path.join(dataDir, 'profiles', '1.8', 'mods'), { recursive: true })
   applyPvpFeelProfile(gameDir, dataDir)
-  applyAtlasPack()
+  applyOpticPack()
   const launcherCache = path.join(dataDir, 'launcher-cache')
   fs.mkdirSync(launcherCache, { recursive: true })
   fs.writeFileSync(path.join(launcherCache, 'installation-id'), 'lunar-revamped')
@@ -467,11 +467,28 @@ async function runShell(command: string, cwd: string): Promise<void> {
   })
 }
 
-export async function startGame(): Promise<LaunchState> {
+function joinServerArgs(address: string | undefined): string[] {
+  const raw = (address ?? '').trim()
+  if (!raw) return []
+  const cleaned = raw.replace(/^minecraft:\/\//i, '')
+  const hostPart = cleaned.includes('/') ? cleaned.slice(0, cleaned.indexOf('/')) : cleaned
+  const [host, portRaw] = hostPart.split(':')
+  if (!host) return []
+  const port = /^\d+$/.test(portRaw ?? '') ? portRaw! : '25565'
+  return ['--server', host, '--port', port]
+}
+
+export async function startGame(joinServer?: string): Promise<LaunchState> {
   if (state.running) throw new Error('The game is already running.')
   let plan: Plan | null = null
   try {
     plan = await buildPlan(true)
+    const join = joinServerArgs(joinServer)
+    if (join.length) {
+      plan.args.push(...join)
+      plan.display = `${plan.display} ${join.map((arg) => (/\s/.test(arg) ? `"${arg}"` : arg)).join(' ')}`
+      pushLine('launcher', `Auto-joining ${join[1]}:${join[3]}`)
+    }
     await runShell(plan.pre, plan.gameDir)
     const accounts = path.join(plan.dataDir, 'settings', 'game', 'accounts.json')
     writeGameAccounts(accounts)
